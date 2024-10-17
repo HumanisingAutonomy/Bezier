@@ -20,9 +20,18 @@ set(Bezier_INC
   ${PROJECT_SOURCE_DIR}/include/Bezier/polycurve.h
   )
 
+
+# detect if we have been included via add_subdirectory
+set(NOT_IN_SUB_PROJECT OFF)
+if (PROJECT_NAME STREQUAL CMAKE_PROJECT_NAME)
+  set(NOT_IN_SUB_PROJECT ON)
+endif()
+message("BUILD TESTS: ${NOT_IN_SUB_PROJECT}")
+
 # Options
 option(BUILD_SHARED_LIBS "Build shared library (.so) instead of static one (.a)" OFF)
-option(BEZIER_BUILD_TESTS "Build tests" ON)
+# only include tests by default if we are building this project directly
+option(BEZIER_BUILD_TESTS "Build tests" ${NOT_IN_SUB_PROJECT})
 
 # build rules
 
