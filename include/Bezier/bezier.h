@@ -176,6 +176,14 @@ public:
   Eigen::MatrixX2d sample(const size_t num) const;
 
   /*!
+   * \brief Blend two curves together with some factor alpha
+   * \param other the other curve to blend with
+   * \param alpha amount to blend. A value of 0 is equivalent to this, and 1 equivalent to other.
+   * \return Curve blended curve
+   */
+  Curve blend(const Curve& other, const double alpha) const;
+
+  /*!
    * \brief Get curvature of the curve for a given t
    * \param t Curve parameter
    * \return Curvature of a curve for a given t

@@ -2,6 +2,7 @@
 
 #include <numeric>
 
+#include <stdexcept>
 #include <unsupported/Eigen/FFT>
 #include <unsupported/Eigen/MatrixFunctions>
 #include <unsupported/Eigen/Polynomials>
@@ -355,6 +356,16 @@ Eigen::MatrixX2d Curve::sample(const size_t num) const
   }
   return valueAt(t_vector);
 }
+
+Curve Curve::blend(const Curve& other, const double alpha) const {
+  if (control_points_.rows() != other.control_points_.rows())
+    throw std::logic_error {"Cannot blend bezier curves of different order."};
+  
+  Eigen::MatrixX2d blended = control_points_ * (1 - alpha) + other.control_points_ * alpha;
+
+  return Curve {blended};
+}
+
 
 double Curve::curvatureAt(double t) const
 {
