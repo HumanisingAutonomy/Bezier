@@ -169,6 +169,13 @@ public:
   Eigen::MatrixX2d valueAt(const std::vector<double>& t_vector) const;
 
   /*!
+   * \brief Sample the curve at `num` equally spaced points
+   * \param num number of points to sample
+   * \return Matrix of points on a curve equally spaced
+   */
+  Eigen::MatrixX2d sample(const size_t num) const;
+
+  /*!
    * \brief Get curvature of the curve for a given t
    * \param t Curve parameter
    * \return Curvature of a curve for a given t
@@ -262,9 +269,11 @@ public:
   /*!
    * \brief Get the parameter t where curve is closest to given point
    * \param point Point to project on curve
+   * \param clamp if true, the t value will be restricted from 0 to 1,
+                  otherwise the point is projected to the extrapolated curve
    * \return double t
    */
-  double projectPoint(const Point& point) const;
+  double projectPoint(const Point& point, bool clamp = true) const;
 
   /*!
    * \brief Get distance of the point to the curve

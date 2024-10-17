@@ -347,6 +347,15 @@ Eigen::MatrixX2d Curve::valueAt(const std::vector<double>& t_vector) const
   return power_basis * bernsteinCoeffs(N_) * control_points_;
 }
 
+Eigen::MatrixX2d Curve::sample(const size_t num) const
+{
+  std::vector<double> t_vector;
+  for (double t = 0; t < 1; t+= 1.0 / static_cast<double>(num)) {
+    t_vector.push_back(t);
+  }
+  return valueAt(t_vector);
+}
+
 double Curve::curvatureAt(double t) const
 {
   Vector d1 = derivativeAt(t);
@@ -534,7 +543,7 @@ PointVector Curve::intersections(const Curve& curve) const
   return intersections;
 }
 
-double Curve::projectPoint(const Point& point) const
+double Curve::projectPoint(const Point& point, bool clamp) const
 {
   if (!cached_projection_polynomial_part_)
   {
@@ -555,11 +564,19 @@ double Curve::projectPoint(const Point& point) const
       cached_projection_polynomial_derivative_ * point;
 
   auto trimmed = _trimZeroes(polynomial);
-  _PolynomialRoots candidates(trimmed.size());
+  std::vector<double> candidates(trimmed.size());  
   if (trimmed.size() > 1)
   {
     Eigen::PolynomialSolver<double, Eigen::Dynamic> poly_solver(trimmed);
     poly_solver.realRoots(candidates);
+  }
+  if (clamp) {
+    candidates.erase(
+      std::remove_if(
+        candidates.begin(), 
+        candidates.end(), 
+        [](const double& item) { return item < 0 || item > 1; }),
+      candidates.end());
   }
 
   double min_t = (point - valueAt(0.0)).norm() < (point - valueAt(1.0)).norm() ? 0.0 : 1.0;

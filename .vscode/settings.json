@@ -1,0 +1,9 @@
+{
+    "clangd.arguments": [
+        "-log=info",
+        "-pretty",
+        "--background-index",
+        "--compile-commands-dir=./build/"
+    ],
+    "editor.formatOnSave": false
+}

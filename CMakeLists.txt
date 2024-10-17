@@ -22,6 +22,7 @@ set(Bezier_INC
 
 # Options
 option(BUILD_SHARED_LIBS "Build shared library (.so) instead of static one (.a)" OFF)
+option(BEZIER_BUILD_TESTS "Build tests" ON)
 
 # build rules
 
@@ -50,3 +51,7 @@ install(TARGETS bezier
 install(EXPORT bezier-export DESTINATION "lib/cmake/Bezier" FILE BezierConfig.cmake)
 
 add_library(bezier::bezier ALIAS bezier)
+
+if(BEZIER_BUILD_TESTS)
+  add_subdirectory(tests)
+endif()
