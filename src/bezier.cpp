@@ -3,6 +3,7 @@
 #include <numeric>
 
 #include <stdexcept>
+#include <string>
 #include <unsupported/Eigen/FFT>
 #include <unsupported/Eigen/MatrixFunctions>
 #include <unsupported/Eigen/Polynomials>
@@ -353,10 +354,14 @@ Eigen::MatrixX2d Curve::valueAt(const std::vector<double>& t_vector) const
   return power_basis * bernsteinCoeffs(N_) * control_points_;
 }
 
-Eigen::MatrixX2d Curve::sample(const size_t num) const
-{
+Eigen::MatrixX2d Curve::sample(const size_t num, const double start,
+                               const double end) const {
+  if (start >= end)
+    throw std::invalid_argument(
+        "End must be greater than start. got start: " + std::to_string(start) +
+        ", end: " + std::to_string(end));
   std::vector<double> t_vector;
-  for (double t = 0; t < 1; t+= 1.0 / static_cast<double>(num)) {
+  for (double t = start; t < 1; t += (end - start) / static_cast<double>(num)) {
     t_vector.push_back(t);
   }
   return valueAt(t_vector);

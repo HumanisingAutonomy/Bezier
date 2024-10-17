@@ -177,9 +177,11 @@ public:
   /*!
    * \brief Sample the curve at `num` equally spaced points
    * \param num number of points to sample
+   * \param start starting t value
+   * \param end end t value
    * \return Matrix of points on a curve equally spaced
    */
-  Eigen::MatrixX2d sample(const size_t num) const;
+  Eigen::MatrixX2d sample(const size_t num, const double start = 0, const double end = 1) const;
 
   /*!
    * \brief Blend two curves together with some factor alpha
