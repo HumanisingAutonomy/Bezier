@@ -67,6 +67,12 @@ public:
   PointVector controlPoints() const;
 
   /*!
+   * \brief Get a matrix of control points
+   * \return A matrix of control points
+   */
+  const Eigen::MatrixX2d& controlPointsMatrix() const;
+
+  /*!
    * \brief Get the control point at index idx
    * \param idx Index of chosen control point
    * \return A vector of control points
