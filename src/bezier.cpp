@@ -745,44 +745,19 @@ Curve::Coeffs Curve::lowerOrderCoeffs(unsigned n)
   return lower_order_coeffs_[n];
 }
 
-//! @brief Compute the binomial coefficient for the given n and k. equivalent of n choose k.
-constexpr size_t binomialCoefficient(size_t n, size_t k) noexcept {
-  // taken from https://stackoverflow.com/a/44719165/1097517
-  return (k > n) ? 0 :  // out of range
-             (k == 0 || k == n) ? 1
-                                :  // edge
-             (k == 1 || k == n - 1) ? n
-                                    :  // first
-             (k + k < n) ?             // recursive:
-             (binomialCoefficient(n - 1, k - 1) * n) / k
-                         :                                   //  path to k=1   is faster
-             (binomialCoefficient(n - 1, k) * n) / (n - k);  //  path to k=n-1 is faster
-}
-
-//! @brief calculates the <a href=https://en.wikipedia.org/wiki/Bernstein_polynomial>bernstein polynomial</a>
-//! coefficients
-//!
-//! The following formula is used \f$ B_{i}^{n}(t) = \binom{n}{i} t^{i} \left( 1 - t \right)^{n - i} \f$
-constexpr double bernsteinPolynomial(size_t n, size_t k, double t) {
-  return binomialCoefficient(n, k) * std::pow(t, k) * std::pow(1 - t, n - k);
-}
-
-
 Curve Curve::fit(const Eigen::MatrixX2d &data, const size_t degree) {
   // system would be under determined without enough data
   if (static_cast<size_t>(data.rows()) < degree + 1) {
     throw std::invalid_argument("Bezier fitting doesn't have enough data.");
   }
 
+  const auto coefs = bernsteinCoeffs(degree + 1);
+
   // generate matrix
   Eigen::MatrixXd B(data.rows(), degree + 1);
   for (size_t i = 0; i < static_cast<size_t>(data.rows()); i++) {
     const auto t = static_cast<double>(i) / data.rows();
-    for (size_t k = 0; k < degree + 1; k++) {
-      // TODO: use bernsteinCoeffs instead
-      const auto b = bernsteinPolynomial(degree, k, t);
-      B(i, k) = b;
-    }
+    B.row(i) = _powSeries(t, degree + 1) * coefs;
   }
 
   // least squares fit
