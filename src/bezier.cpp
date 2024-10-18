@@ -745,6 +745,7 @@ Curve::Coeffs Curve::lowerOrderCoeffs(unsigned n)
   return lower_order_coeffs_[n];
 }
 
+// https://www.jimherold.com/computer-science/best-fit-bezier-curve
 Curve Curve::fit(const Eigen::MatrixX2d &data, const size_t degree) {
   // system would be under determined without enough data
   if (static_cast<size_t>(data.rows()) < degree + 1) {
@@ -753,12 +754,27 @@ Curve Curve::fit(const Eigen::MatrixX2d &data, const size_t degree) {
 
   const auto coefs = bernsteinCoeffs(degree + 1);
 
+  Eigen::VectorXd segment_lengths(data.rows());
+
+  // prepend segment lengths with 0
+  segment_lengths << 0,
+      (data.bottomRows(data.rows() - 1) - data.topRows(data.rows() - 1))
+          .rowwise()
+          .norm();
+  Eigen::VectorXd cumulative_lengths(data.rows());
+  std::partial_sum(segment_lengths.begin(), segment_lengths.end(),
+                   cumulative_lengths.begin());
+  // t value corresponding to each point
+  Eigen::VectorXd ts = cumulative_lengths / cumulative_lengths(data.rows() - 1);
+
   // generate matrix
   Eigen::MatrixXd B(data.rows(), degree + 1);
   for (size_t i = 0; i < static_cast<size_t>(data.rows()); i++) {
-    const auto t = static_cast<double>(i) / data.rows();
+    const auto t = ts(i);
     B.row(i) = _powSeries(t, degree + 1) * coefs;
   }
+
+  // std::cout << B.format(NumpyFormat) << std::endl;
 
   // least squares fit
   const Eigen::MatrixXd V = B.fullPivHouseholderQr().solve(data);

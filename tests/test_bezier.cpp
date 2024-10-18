@@ -122,7 +122,7 @@ TEST(Bezier, test_straight_line_regression) {
 TEST(Bezier, test_sin_regression) {
   const auto fn = [](double x) { return std::sin(x); };
 
-  checkRegression(fn, 4);
+  checkRegression(fn, 5);
 }
 
 TEST(Bezier, test_mean_linear) {
