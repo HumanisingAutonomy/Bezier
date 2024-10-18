@@ -360,10 +360,8 @@ Eigen::MatrixX2d Curve::sample(const size_t num, const double start,
     throw std::invalid_argument(
         "End must be greater than start. got start: " + std::to_string(start) +
         ", end: " + std::to_string(end));
-  std::vector<double> t_vector;
-  for (double t = start; t < 1; t += (end - start) / static_cast<double>(num)) {
-    t_vector.push_back(t);
-  }
+  const Eigen::VectorXd values = Eigen::VectorXd::LinSpaced(num, start, end);
+  std::vector<double> t_vector(values.data(), values.data() + num);
   return valueAt(t_vector);
 }
 
